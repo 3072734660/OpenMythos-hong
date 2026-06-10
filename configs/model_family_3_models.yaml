@@ -1,0 +1,34 @@
+family_name: public_moe_code_trace
+prompt_style: code_stdout_exact
+supports_multiturn: true
+supports_prefix_kv_cache: true
+
+models:
+  tiny_debug:
+    config: configs/family_tiny_moe_quant.yaml
+    backend: tiny_true_moe
+    role: 调试训练流程；不提交训练权重
+    quantization: int8_dynamic
+    local_run: true
+
+  local_cuda_small_moe:
+    config: configs/family_small_moe_3050ti_4g.yaml
+    backend: hf_transformers
+    model_id: allenai/OLMoE-1B-7B-0125
+    role: 3050Ti 4GB 低显存本地 QLoRA
+    quantization: 4bit_nf4
+    local_run: true
+
+  cluster_moe:
+    config: configs/family_cluster_moe_smaller_than_oss20b.yaml
+    backend: hf_transformers
+    model_id: Qwen/Qwen1.5-MoE-A2.7B
+    role: 多卡或集群 MoE 微调
+    quantization: bf16_or_fp16
+    local_run: false
+
+repository_policy:
+  include_generated_data: false
+  include_eval_scripts: false
+  include_checkpoints: false
+  include_model_weights: false
