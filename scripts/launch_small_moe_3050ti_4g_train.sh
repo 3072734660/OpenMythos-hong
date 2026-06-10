@@ -1,0 +1,1 @@
+python training/train_public_pretrained_moe_lora.py --config configs/family_small_moe_3050ti_4g.yaml --train-jsonl data/train.jsonl --output-dir checkpoints/olmoe_lora --max-steps 1000 --micro-batch-size 1
