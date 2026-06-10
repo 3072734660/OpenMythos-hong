@@ -1,0 +1,61 @@
+model_family:
+  family_name: public_moe_code_trace
+  size: small_moe_1b_active_3050ti_4g
+  role: local_cuda_train_low_vram
+  architecture_style: public_sparse_moe_causal_lm
+  prompt_style: code_stdout_exact
+  train_jsonl: data/train.jsonl
+  eval_jsonl: data/eval.jsonl
+  supports_multiturn: true
+public_pretrained_moe:
+  backend: hf_transformers
+  model_id: allenai/OLMoE-1B-7B-0125
+  local_model_path: ${OLMOE_1B_7B_DIR:-models/OLMoE-1B-7B-0125}
+  local_files_only: true
+  trust_remote_code: false
+  require_true_moe: true
+  dtype: bfloat16
+  amp_dtype: fp16
+  device: cuda
+  device_map: auto
+  quantize: 4bit_bnb
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_use_double_quant: true
+  bnb_4bit_compute_dtype: float16
+  max_memory:
+    0: 3300MiB
+    cpu: 48GiB
+  offload_folder: offload/olmoe_1b_7b_3050ti_4g
+  offload_state_dict: true
+  low_cpu_mem_usage: true
+  response_cache_size: 64
+  use_chat_template: false
+  gradient_checkpointing: true
+  lora_r: 4
+  lora_alpha: 8
+  lora_dropout: 0.05
+  optim: paged_adamw_8bit
+  enable_prefix_cache: true
+  prefix_cache_size: 16
+  prefix_cache_min_tokens: 1
+training:
+  method: qlora_4bit_low_vram
+  max_steps: 1000
+  micro_batch_size: 1
+  learning_rate: 0.0001
+  max_length: 256
+  expected_gpu: RTX 3050 Ti Laptop 4GB
+  response_only_labels: true
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  max_grad_norm: 0.3
+  save_steps: 50
+  eval_steps: 25
+  save_total_limit: 2
+  pad_to_multiple_of: 8
+  pin_memory: true
+  gradient_accumulation_steps: 16
+serving:
+  max_new_tokens: 96
+  temperature: 0.0
+  top_k: 1
