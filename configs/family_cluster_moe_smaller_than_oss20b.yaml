@@ -1,0 +1,48 @@
+model_family:
+  family_name: public_moe_code_trace
+  size: cluster_moe_smaller_than_oss20b
+  role: cluster_train
+  architecture_style: public_sparse_moe_causal_lm
+  prompt_style: code_stdout_exact
+  train_jsonl: data/train.jsonl
+  eval_jsonl: data/eval.jsonl
+  supports_multiturn: true
+public_pretrained_moe:
+  backend: hf_transformers
+  model_id: Qwen/Qwen1.5-MoE-A2.7B
+  local_model_path: ${QWEN15_MOE_DIR:-models/Qwen1.5-MoE-A2.7B}
+  local_files_only: true
+  trust_remote_code: true
+  require_true_moe: true
+  dtype: bfloat16
+  device: cuda
+  device_map: auto
+  quantize: none
+  response_cache_size: 256
+  use_chat_template: true
+  gradient_checkpointing: true
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  optim: adamw_torch
+  enable_prefix_cache: true
+  prefix_cache_size: 64
+  prefix_cache_min_tokens: 16
+training:
+  method: lora_cluster
+  max_steps: 2000
+  micro_batch_size: 1
+  gradient_accumulation_steps: 8
+  learning_rate: 0.00005
+  max_length: 1024
+  response_only_labels: true
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  max_grad_norm: 1.0
+  save_steps: 100
+  eval_steps: 50
+  save_total_limit: 3
+serving:
+  max_new_tokens: 256
+  temperature: 0.0
+  top_k: 1
